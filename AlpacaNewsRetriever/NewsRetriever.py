@@ -45,6 +45,7 @@ class AlpacaNewsRetriever:
                 print("Status --- API call limit reached. Sleep for 60 seconds")
                 time.sleep(60)
                 num_call = 0
+                print("Status --- Sleep finished. Resuming...")
             raw_response = self.get_raw_request(symbol, start, end, limit, token=token)
             token = raw_response['next_page_token']
             df = pd.concat([df, self.post_process(raw_response, symbol)], ignore_index=True)

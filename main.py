@@ -10,6 +10,6 @@ API_KEY = os.environ['API_KEY']
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     retriever = ANR(API_ID, API_KEY)
-    df = retriever.get_news('AAPL', '2019-01-01', '2019-01-20', limit=35)
+    df = retriever.get_news('AAPL', '2019-01-18', '2019-01-20', limit=50)
     pd.set_option('display.max_columns', None)
     print(df)

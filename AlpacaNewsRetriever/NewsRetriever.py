@@ -13,7 +13,7 @@ class AlpacaNewsRetriever:
         symbol: Ticker of the stock. e.g. AAPL
         start: start timestamp in RFC 3339 format. e.g. 01-01-2015
         end: end timestamp in RFC 3339 format. e.g. 01-01-2019
-        limit: number of news to retrieve.
+        limit: number of news per page, max 50.
 
         return: a pandas dataframe contains the news
     """
@@ -25,7 +25,7 @@ class AlpacaNewsRetriever:
     def get_news(self, symbol, start, end, limit=50):
         raw_response = self.get_raw_request(symbol, start, end, limit)
         if limit <= 50:
-            #  print(raw_response)
+            print(raw_response)
             return self.post_process(raw_response, symbol)
         else:
             # TODO: add pagination to API call

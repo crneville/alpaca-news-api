@@ -5,7 +5,9 @@ import os
 from tqdm import tqdm
 from AlpacaNewsRetriever.NewsRetriever import AlpacaNewsRetriever as ANR
 from dotenv import load_dotenv
-load_dotenv()
+
+script_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+load_dotenv(os.path.join(script_dir, '.env'))
 
 API_ID = os.environ['API_ID']
 API_KEY = os.environ['API_KEY']
@@ -26,7 +28,7 @@ if __name__ == '__main__':
     config = parser.parse_args()
 
     script_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-    tickers = read_tickers(os.path.join(script_dir, 'data', 'tickers.txt'))
+    tickers = read_tickers(os.path.join(script_dir, 'tickers.txt'))
     retriever = ANR(API_ID, API_KEY, include_content=config.content)
 
     desc = 'Fetching Historical News'
@@ -35,5 +37,8 @@ if __name__ == '__main__':
         pbar.set_description(desc+f' for {ticker}', refresh=True)
         df = retriever.get_news(ticker, config.start, config.end)
         if df is not None:
-            df.to_csv(f"data/{ticker}.csv")
+            filename = os.path.join(script_dir, 'data', f"{ticker}.csv")
+            file_exists = os.path.isfile(filename) 
+            place_header = not file_exists
+            df.sort_values('timestamp').drop_duplicates().to_csv(f"data/{ticker}.csv", mode='a',header=place_header)
     print('All Done!')

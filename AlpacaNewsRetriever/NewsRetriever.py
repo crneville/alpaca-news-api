@@ -75,8 +75,13 @@ class AlpacaNewsRetriever:
         url += f'start={start}&end={end}&symbols={urllib.parse.quote(symbol)}&limit={limit}&include_content={self.content}'
         if token is not None:
             url += f'&page_token={token}'
+
         response = requests.get(url, headers={"Apca-Api-Key-Id": self.API_ID, 'Apca-Api-Secret-Key': self.API_KEY})
-        return response.json()
+        try:
+            return response.json()
+        except:
+            print(f'Error with {url}: {response}')
+            raise
 
     def post_process(self, content, symbol):
         news_dict = {'ticker':[], 'timestamp':[], 'headline':[], 'summary':[]}

@@ -44,12 +44,12 @@ if __name__ == '__main__':
         try:
             filepath = os.path.join(script_dir, 'data', f"{ticker}.parquet")
             file_exists = os.path.isfile(filepath)
+            start = config.start
+            oldnews = pd.DataFrame()
             if file_exists:
                 oldnews = pd.read_parquet(filepath)
-                start = f'{oldnews.index.max() + pd.Timedelta(days=1):%Y-%m-%d}'
-            else:
-                start = config.start
-                oldnews = pd.DataFrame()
+                if not oldnews.empty:
+                    start = f'{oldnews.index.max() + pd.Timedelta(days=1):%Y-%m-%d}'
 
             news = retriever.get_news(ticker, start, config.end)
             

@@ -2,6 +2,7 @@
 import pandas as pd
 import datetime
 import time
+import random
 import os, sys
 import json
 from tqdm import tqdm
@@ -29,13 +30,20 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-content', action='store_true')
+    parser.add_argument('--reverse', action='store_true')
+    parser.add_argument('--shuffle', action='store_true')
     parser.add_argument('--start', default='2015-01-01')
     parser.add_argument('--end', default=f'{datetime.datetime.now()-datetime.timedelta(days=1):%Y-%m-%d}')
     config = parser.parse_args()
 
     script_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-    tickers = read_tickers(os.path.join(script_dir, 'tickers.txt'))
     retriever = ANR(API_ID, API_KEY, include_content=not config.no_content)
+    tickers = read_tickers(os.path.join(script_dir, 'tickers.txt'))
+
+    if config.reverse:
+        tickers = tickers[::-1]
+    if config.shuffle:
+        random.shuffle(tickers)
 
     desc = 'Fetching Historical News'
     pbar = tqdm(tickers, desc=desc)

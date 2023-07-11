@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 script_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 
-if 'API_ID' not in os.environ or 'API_KEY' not in environ:
+if 'API_ID' not in os.environ or 'API_KEY' not in os.environ:
     load_dotenv(os.path.join(script_dir, '.env'))
 
 API_ID = os.environ['API_ID']

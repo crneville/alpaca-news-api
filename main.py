@@ -10,7 +10,9 @@ from AlpacaNewsRetriever.NewsRetriever import AlpacaNewsRetriever as ANR
 from dotenv import load_dotenv
 
 script_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-load_dotenv(os.path.join(script_dir, '.env'))
+
+if 'API_ID' not in os.environ or 'API_KEY' not in environ:
+    load_dotenv(os.path.join(script_dir, '.env'))
 
 API_ID = os.environ['API_ID']
 API_KEY = os.environ['API_KEY']

@@ -43,9 +43,14 @@ if __name__ == '__main__':
     parser.add_argument('--start', default='2015-01-01')
     parser.add_argument('--end', default=f'{pd.Timestamp.now().now().normalize():%Y-%m-%d}')
     parser.add_argument('--no-update', action='store_true')
+    parser.add_argument('--ticker-db', default=None)
     parser.add_argument('--tickers', default=None)
+    parser.add_argument('--crypto', action='store_true')
     parser.add_argument('--creds', default=None)
     config = parser.parse_args()
+
+    if not config.crypto and 'crypto' in config.ticker_db.lower():
+        config.crypto = True
 
     if 'API_ID' in os.environ and 'API_KEY' in os.environ:
         api_id, api_key = os.environ['API_ID'], os.environ['API_KEY']
@@ -56,7 +61,9 @@ if __name__ == '__main__':
 
     script_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     retriever = ANR(api_id, api_key, include_content=not config.no_content)
-    tickers = read_tickers(os.path.join(script_dir, 'tickers.txt'))
+    
+    tickerfilename = config.ticker_db if config.ticker_db else ('tickers.txt' if not config.crypto else 'cryptotickers.txt')
+    tickers = read_tickers(os.path.join(script_dir, tickerfilename))
 
     if config.tickers is not None:
         tickers = filter_tickers(tickers, config.tickers)
@@ -66,12 +73,16 @@ if __name__ == '__main__':
     if config.shuffle:
         random.shuffle(tickers)
 
+    datadir = os.path.join(script_dir, 'data')
+    if config.crypto: datadir = os.path.join(datadir, 'crypto')
+
     desc = 'Fetching Historical News'
     pbar = tqdm(tickers, desc=desc)
+
     for ticker in pbar:
         pbar.set_description(desc+f' for {ticker}', refresh=True)
         try:
-            filepath = os.path.join(script_dir, 'data', f"{ticker}.parquet")
+            filepath = os.path.join(datadir, f"{ticker}.parquet")
             file_exists = os.path.isfile(filepath)
             start = config.start
             
@@ -84,7 +95,10 @@ if __name__ == '__main__':
                 if not oldnews.empty and not config.no_update:
                     start = f'{oldnews.index.max().normalize():%Y-%m-%d}'
 
-            news = retriever.get_news(ticker, start, config.end)
+            if config.crypto:
+                news = retriever.get_news(ticker.replace('-',''), start, config.end)
+            else:
+                news = retriever.get_news(ticker, start, config.end)
             
             if news is not None:
                 news['timestamp'] = pd.to_datetime(news['timestamp'])

@@ -49,7 +49,7 @@ if __name__ == '__main__':
     parser.add_argument('--creds', default=None)
     config = parser.parse_args()
 
-    if not config.crypto and 'crypto' in config.ticker_db.lower():
+    if not config.crypto and config.ticker_db and 'crypto' in config.ticker_db.lower():
         config.crypto = True
 
     if 'API_ID' in os.environ and 'API_KEY' in os.environ:
